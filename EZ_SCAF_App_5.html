@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EZ-SCAF">
+<meta name="theme-color" content="#C44A1A">
+<title>EZ-SCAF</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --o:#C44A1A;--od:#9E3A12;--op:#FDE8DC;
+  --d:#111;--d2:#1E1E1E;--d3:#2A2A2A;--d4:#3A3A3A;
+  --g:#F4F2EF;--g2:#E5E3DF;--g3:#CCCAC6;
+  --w:#FFFFFF;
+  --gr:#1A7A3F;--grp:#D4EDDA;
+  --re:#B83232;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--g);color:var(--d);display:flex;flex-direction:column}
+
+/* HEADER */
+#hdr{background:var(--d);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:2px}
+.logo em{color:var(--o);font-style:normal}
+.job-pill{background:var(--o);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:none;letter-spacing:.3px}
+
+/* TABS */
+#tabs{background:var(--d2);display:flex;flex-shrink:0;border-bottom:2px solid var(--o)}
+.tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:54px;color:#666;font-size:10px;font-weight:700;letter-spacing:.8px;cursor:pointer;border:none;background:none;position:relative;transition:color .15s}
+.tb svg{width:18px;height:18px;stroke-width:1.8}
+.tb.on{color:var(--o)}
+.tb.on::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--o)}
+
+/* PAGES */
+.page{display:none;flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;flex-direction:column}
+.page.on{display:flex}
+
+/* SEARCH */
+.srch-wrap{padding:10px 14px 8px;background:var(--g);flex-shrink:0;border-bottom:1px solid var(--g2);position:sticky;top:0;z-index:40}
+.srch{width:100%;background:var(--w);border:1.5px solid var(--g2);border-radius:8px;padding:9px 12px 9px 34px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:11px center;transition:border-color .15s}
+.srch:focus{border-color:var(--o)}
+
+/* CATEGORY */
+.cat-hdr{background:var(--d3);color:#bbb;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;flex-shrink:0}
+.cat-hdr .arr{font-size:9px;opacity:.4;transition:transform .2s}
+.cat-hdr.shut .arr{transform:rotate(-90deg)}
+.cat-items{background:var(--w)}
+.cat-items.shut{display:none}
+
+/* ITEM ROW */
+.ir{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid var(--g2);gap:10px}
+.ir.lit{background:#FFFAF7}
+.ii{flex:1;min-width:0}
+.idesc{font-size:13.5px;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.imeta{font-size:11px;color:#999;margin-top:1px;display:flex;gap:8px}
+
+/* QTY CONTROL */
+.qw{display:flex;align-items:center;flex-shrink:0}
+.qb{width:30px;height:34px;background:var(--g);border:1px solid var(--g2);color:var(--d);font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none}
+.qb:first-child{border-radius:7px 0 0 7px}
+.qb:last-child{border-radius:0 7px 7px 0}
+.qb:active{background:var(--g2)}
+.qi{width:44px;height:34px;border:1px solid var(--g2);border-left:none;border-right:none;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--o);outline:none;background:#fff}
+.qi:focus{background:var(--op);border-color:var(--o)}
+.qtot{font-size:11px;font-weight:700;color:#ccc;min-width:44px;text-align:right;flex-shrink:0}
+.qtot.v{color:var(--o)}
+
+/* ACTION BAR */
+.abar{padding:10px 14px;display:flex;gap:8px;background:var(--g);border-top:1px solid var(--g2);flex-shrink:0}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:10px 16px;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;border:none;transition:opacity .12s;white-space:nowrap}
+.btn:active{opacity:.8;transform:scale(.97)}
+.bo{background:var(--o);color:#fff}.bd{background:var(--d3);color:#fff}
+.br{background:var(--re);color:#fff}.bgh{background:transparent;border:1.5px solid var(--g2);color:#888}
+.bf{flex:1}.bsm{padding:7px 12px;font-size:12px}
+
+/* STOCK PAGE */
+.sk-dash{background:var(--d);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;flex-shrink:0}
+.sk-card{background:rgba(255,255,255,.07);border-radius:8px;padding:10px;text-align:center}
+.sk-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--o);line-height:1}
+.sk-lbl{font-size:9px;color:rgba(255,255,255,.4);margin-top:2px;font-weight:700;letter-spacing:.5px}
+
+.sk-filters{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;background:var(--g);border-bottom:1px solid var(--g2)}
+.sk-filters::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;border:1.5px solid var(--g2);background:var(--w);color:#888;cursor:pointer;transition:all .12s}
+.chip.on{background:var(--o);border-color:var(--o);color:#fff}
+
+.sk-row{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--g2);background:var(--w);gap:12px}
+.sk-info{flex:1;min-width:0}
+.sk-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sk-meta{font-size:11px;color:#999;margin-top:1px}
+.sk-qty-box{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.sk-num{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
+.sk-num.pos{color:var(--gr)}.sk-num.zero{color:#bbb}.sk-num.neg{color:var(--re)}
+.sk-src{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.5px}
+.s-ez{background:var(--o);color:#fff}.s-lay{background:var(--d3);color:#fff}
+.sk-moves{font-size:10px;color:#999;display:flex;gap:8px}
+.sk-moves span{display:flex;align-items:center;gap:2px}
+.in-lbl{color:var(--gr)} .out-lbl{color:var(--re)}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:flex-end}
+.overlay.on{display:flex}
+.modal{background:var(--w);border-radius:18px 18px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:18px 16px 40px;animation:su .28s ease}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhandle{width:36px;height:4px;background:var(--g2);border-radius:2px;margin:0 auto 16px}
+.mtitle{font-family:'Bebas Neue',sans-serif;font-size:22px;margin-bottom:4px}
+.msub{font-size:13px;color:#888;margin-bottom:14px}
+.mfield{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.mfield label{font-size:12px;font-weight:700;color:#666;letter-spacing:.3px}
+.mfield input{border:1.5px solid var(--g2);border-radius:8px;padding:10px 12px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none}
+.mfield input:focus{border-color:var(--o)}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 24px;color:#bbb;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.empty .ico{font-size:44px;margin-bottom:12px}
+.empty h3{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#ccc;margin-bottom:6px}
+.empty p{font-size:13px;line-height:1.5;color:#aaa}
+
+/* TOAST */
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--d);color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:all .25s;z-index:400;pointer-events:none;white-space:nowrap;border-left:3px solid var(--o)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(min-width:500px){body{max-width:460px;margin:0 auto;box-shadow:0 0 60px rgba(0,0,0,.15)}}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div class="logo">EZ<em>-SCAF</em></div>
+  <button class="job-pill" id="jobPill" onclick="openModal('jmod')">+ SET JOB</button>
+</div>
+
+<div id="tabs">
+  <button class="tb on" id="tb-ez" onclick="nav('ez')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    EZ-SCAF
+  </button>
+  <button class="tb" id="tb-lay" onclick="nav('lay')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><rect x="2" y="10" width="6" height="6" rx="1"/><rect x="9" y="10" width="6" height="6" rx="1"/><rect x="2" y="17" width="6" height="6" rx="1"/><rect x="9" y="17" width="6" height="6" rx="1"/></svg>
+    LAYHER
+  </button>
+  <button class="tb" id="tb-sk" onclick="nav('sk')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 10V11"/></svg>
+    STOCK
+  </button>
+</div>
+
+<!-- EZ-SCAF PAGE -->
+<div class="page on" id="pg-ez">
+  <div class="srch-wrap"><input class="srch" id="ez-srch" placeholder="Search EZ-SCAF items…" oninput="renderEZ()"></div>
+  <div id="ez-body" style="flex:1"></div>
+  <div class="abar">
+    <button class="btn bo bf" onclick="openSendModal('ez')">✉ SEND PICK LIST</button>
+    <button class="btn bgh bsm" onclick="clearQty('ez')">🗑</button>
+  </div>
+</div>
+
+<!-- LAYHER PAGE -->
+<div class="page" id="pg-lay">
+  <div class="srch-wrap"><input class="srch" id="lay-srch" placeholder="Search Layher items…" oninput="renderLay()"></div>
+  <div id="lay-body" style="flex:1"></div>
+  <div class="abar">
+    <button class="btn bd bf" onclick="openSendModal('lay')">✉ SEND ORDER LIST</button>
+    <button class="btn bgh bsm" onclick="clearQty('lay')">🗑</button>
+  </div>
+</div>
+
+<!-- STOCK PAGE -->
+<div class="page" id="pg-sk">
+  <div class="sk-dash" id="sk-dash"></div>
+  <div class="sk-filters">
+    <div class="chip on" onclick="skF('all',this)">ALL</div>
+    <div class="chip" onclick="skF('ez',this)">EZ-SCAF</div>
+    <div class="chip" onclick="skF('lay',this)">LAYHER</div>
+  </div>
+  <div class="srch-wrap" style="top:0"><input class="srch" id="sk-srch" placeholder="Search stock…" oninput="renderStock()"></div>
+  <div id="sk-body" style="flex:1"></div>
+</div>
+
+<!-- SEND EMAIL MODAL -->
+<div class="overlay" id="smod">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle" id="s-title">Send Pick List</div>
+    <div class="msub" id="s-sub"></div>
+    <div class="mfield">
+      <label>SEND TO EMAIL</label>
+      <input type="email" id="s-email" placeholder="e.g. office@example.com" inputmode="email">
+    </div>
+    <div id="s-preview" style="background:var(--g);border-radius:8px;padding:12px;font-size:12px;font-family:monospace;white-space:pre-wrap;max-height:36vh;overflow-y:auto;color:#444;margin-bottom:14px;line-height:1.6;border:1px solid var(--g2)"></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn bf" id="s-send" onclick="doSend()">✉ OPEN EMAIL APP</button>
+      <button class="btn bgh bf" onclick="closeModal('smod')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- JOB MODAL -->
+<div class="overlay" id="jmod">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">Job Details</div>
+    <div class="mfield"><label>JOB NUMBER</label><input id="j-num" placeholder="e.g. JOB-2025-001"></div>
+    <div class="mfield"><label>DATE</label><input type="date" id="j-date"></div>
+    <div class="mfield"><label>OPERATOR</label><input id="j-op" placeholder="Your name"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn bo bf" onclick="saveJob()">SAVE</button>
+      <button class="btn bgh bf" onclick="closeModal('jmod')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const EZ = [{"cat":"Scaffold Tube","desc":"0.3m","code":"450403","unit":1.35},{"cat":"Scaffold Tube","desc":"0.6m","code":"450406","unit":2.7},{"cat":"Scaffold Tube","desc":"0.9m","code":"450409","unit":4.05},{"cat":"Scaffold Tube","desc":"1.2m","code":"450412","unit":5.4},{"cat":"Scaffold Tube","desc":"1.5m","code":"450415","unit":6.75},{"cat":"Scaffold Tube","desc":"1.8m","code":"450418","unit":8.1},{"cat":"Scaffold Tube","desc":"2.1m","code":"450421","unit":9.45},{"cat":"Scaffold Tube","desc":"2.4m","code":"450424","unit":10.8},{"cat":"Scaffold Tube","desc":"2.7m","code":"450427","unit":12.15},{"cat":"Scaffold Tube","desc":"3m","code":"450430","unit":13.5},{"cat":"Scaffold Tube","desc":"3.3m","code":"450433","unit":14.85},{"cat":"Scaffold Tube","desc":"3.6m","code":"450436","unit":16.2},{"cat":"Scaffold Tube","desc":"3.9m","code":"450439","unit":17.55},{"cat":"Scaffold Tube","desc":"4.2m","code":"450442","unit":18.9},{"cat":"Scaffold Tube","desc":"4.5m","code":"450445","unit":20.25},{"cat":"Scaffold Tube","desc":"4.8m","code":"450448","unit":21.6},{"cat":"Scaffold Tube","desc":"5.1m","code":"450451","unit":22.95},{"cat":"Scaffold Tube","desc":"5.4m","code":"450454","unit":24.3},{"cat":"Scaffold Tube","desc":"5.7m","code":"450457","unit":25.65},{"cat":"Scaffold Tube","desc":"6m","code":"450460","unit":27.0},{"cat":"Scaffold Tube","desc":"6.3m","code":"450463","unit":28.35},{"cat":"Scaffold Tube","desc":"SOLE BOARDS","code":"450202","unit":2.57},{"cat":"Fittings","desc":"BASE PLATE - SCAFFOLD","code":"450204","unit":1.0},{"cat":"Fittings","desc":"CASTOR WHEEL POLY","code":"450205","unit":4.0},{"cat":"Fittings","desc":"COUPLER - DOUBLE(90)","code":"450301","unit":1.3},{"cat":"Fittings","desc":"COUPLER - EXT JOINER","code":"450308","unit":1.0},{"cat":"Fittings","desc":"COUPLER - GIRDER (BEAM CLAMPS)","code":"450311","unit":1.5},{"cat":"Fittings","desc":"COUPLER - GIRDER SWIVEL","code":"450312","unit":1.6},{"cat":"Fittings","desc":"COUPLER - INT JOINER","code":"450307","unit":1.15},{"cat":"Fittings","desc":"COUPLER - JETTY","code":"450322","unit":9.85},{"cat":"Fittings","desc":"COUPLER - LADDER HOOK","code":"450316","unit":0.9},{"cat":"Fittings","desc":"COUPLER - PROP DOUBLE","code":"450309","unit":1.0},{"cat":"Fittings","desc":"COUPLER - PROP SWIVEL","code":"450310","unit":1.3},{"cat":"Fittings","desc":"COUPLER - PUTLOG (FULL)","code":"450304","unit":0.7},{"cat":"Fittings","desc":"COUPLER - PUTLOG (HALF/SINGLE)(Pig ears)","code":"450303","unit":0.7},{"cat":"Fittings","desc":"COUPLER - PUTLOG HOOK","code":"450305","unit":0.6},{"cat":"Fittings","desc":"COUPLER - SWIVEL","code":"450302","unit":1.3},{"cat":"Fittings","desc":"DROPPER PIN","code":"457001","unit":1.0},{"cat":"Fittings","desc":"HANDRAIL POST - FLAT 1000M","code":"451010","unit":5.0},{"cat":"Fittings","desc":"JACK - FORMWORK","code":"450213","unit":8.0},{"cat":"Fittings","desc":"JACK - SCAFFOLD","code":"450212","unit":7.5},{"cat":"Fittings","desc":"JACK - SCAFFOLD TILT","code":"450208","unit":9.0},{"cat":"Fittings","desc":"JACK - U HEAD","code":"450230","unit":3.6},{"cat":"Fittings","desc":"TUBE DROPPER 2.4m","code":"457024","unit":12.2},{"cat":"Fittings","desc":"TUBE DROPPER 3.0m","code":"457030","unit":14.9},{"cat":"Aluminium Ladders","desc":"2.4 MTR.","code":"456024","unit":6.0},{"cat":"Aluminium Ladders","desc":"3.0 MTR.","code":"456030","unit":7.0},{"cat":"Aluminium Ladders","desc":"3.6 MTR.","code":"456036","unit":8.0},{"cat":"Aluminium Ladders","desc":"4.2 MTR.","code":"456042","unit":9.5},{"cat":"Aluminium Ladders","desc":"4.8 MTR.","code":"456048","unit":10.8},{"cat":"Aluminium Ladders","desc":"5.4 MTR.","code":"456054","unit":11.85},{"cat":"Aluminium Ladders","desc":"6.0 MTR.","code":"456060","unit":13.57},{"cat":"Laminated Planks","desc":"0.6","code":"455006","unit":3.42},{"cat":"Laminated Planks","desc":"0.9","code":"455009","unit":5.13},{"cat":"Laminated Planks","desc":"1.2","code":"455012","unit":6.84},{"cat":"Laminated Planks","desc":"1.5","code":"455015","unit":8.55},{"cat":"Laminated Planks","desc":"1.8","code":"455018","unit":10.26},{"cat":"Laminated Planks","desc":"2.1","code":"455021","unit":11.97},{"cat":"Laminated Planks","desc":"2.4","code":"455024","unit":13.68},{"cat":"Laminated Planks","desc":"2.7","code":"455027","unit":15.39},{"cat":"Laminated Planks","desc":"3","code":"455030","unit":17.1},{"cat":"Aluminium Beams","desc":"4.0m","code":"453140","unit":17.1},{"cat":"Aluminium Beams","desc":"6.0m","code":"453160","unit":24.9},{"cat":"Aluminium Beams","desc":"8.0m","code":"453180","unit":32.7},{"cat":"Aluminium Beams","desc":"ALUMINIUM BEAM CONNECTORS","code":"453100","unit":2.0},{"cat":"Aluminium Beams","desc":"HINGE PIN","code":"453101","unit":0.05},{"cat":"Fencing Scaffold","desc":"FENCE FOOT","code":"360003","unit":36.0},{"cat":"Fencing Scaffold","desc":"FENCE OUTRIGGER","code":"360004","unit":4.9},{"cat":"Fencing Scaffold","desc":"FENCE OUTRIGGER FOOT (YELLOW)","code":"360006","unit":36.0},{"cat":"Fencing Scaffold","desc":"FENCE OUTRIGGER POST","code":"360007","unit":2.0},{"cat":"Fencing Scaffold","desc":"FENCE PANEL 2.6m","code":"360026","unit":36.0},{"cat":"Fencing Scaffold","desc":"FENCING STILLAGE","code":"360005","unit":25.0},{"cat":"Fencing Scaffold","desc":"HINGE CLAMPS","code":"360002","unit":0.83},{"cat":"Fencing Scaffold","desc":"PANEL CLAMP","code":"360001","unit":1.0},{"cat":"Formwork Props","desc":"PROP No 0 (RED)","code":"530200","unit":15.0},{"cat":"Formwork Props","desc":"PROP No 1 (WHITE)","code":"530201","unit":15.0},{"cat":"Formwork Props","desc":"PROP No 2 (GREEN)","code":"530202","unit":22.5},{"cat":"Formwork Props","desc":"PROP No 3 (BLACK)","code":"530203","unit":25.0},{"cat":"Formwork Props","desc":"PROP No 4 (BLUE)","code":"530204","unit":33.5},{"cat":"Miscellaneous Items","desc":"3.0 mtr. STEEL LADDER  BEAM","code":"451830","unit":40.5},{"cat":"Miscellaneous Items","desc":"3.6 mtr. STEEL LADDER  BEAM","code":"451836","unit":48.6},{"cat":"Miscellaneous Items","desc":"4.2 mtr. STEEL LADDER  BEAM","code":"451842","unit":56.7},{"cat":"Miscellaneous Items","desc":"6.3 mtr. STEEL LADDER  BEAM","code":"451863","unit":85.05},{"cat":"Miscellaneous Items","desc":"BIN WIRE CAGE","code":"90104","unit":40.0},{"cat":"Miscellaneous Items","desc":"CROWD BARRIER","code":"943200","unit":15.25},{"cat":"Miscellaneous Items","desc":"CROWD BARRIER FOOT","code":"943201","unit":1.99},{"cat":"Miscellaneous Items","desc":"CROWD BARRIER R CLIP","code":"943202","unit":0.03},{"cat":"Miscellaneous Items","desc":"GALV. LIFTING STILLAGE","code":"90205","unit":150.0},{"cat":"Miscellaneous Items","desc":"GINNY WHEELS","code":"459010","unit":5.0},{"cat":"Miscellaneous Items","desc":"HANDRAIL STAND (A FRAME)","code":"459014","unit":10.4},{"cat":"Miscellaneous Items","desc":"HOOKS FOR STAGING","code":"498706","unit":4.0},{"cat":"Miscellaneous Items","desc":"SLINGING FRAME","code":"90204","unit":11.0},{"cat":"Miscellaneous Items","desc":"SPANDECK 4.3 MTR","code":"498643","unit":27.0},{"cat":"Miscellaneous Items","desc":"SPANDECK 5.3 MTR","code":"498653","unit":34.0},{"cat":"Miscellaneous Items","desc":"SPANDECK 7.3 MTR","code":"498673","unit":48.0},{"cat":"Miscellaneous Items","desc":"SPANDECK GUARDRAIL 3.0M","code":"498730","unit":3.0},{"cat":"Miscellaneous Items","desc":"SPANDECK GUARDRAIL 4.0M","code":"498740","unit":3.0},{"cat":"Miscellaneous Items","desc":"SPANDECK GUARDRAIL 5.0M","code":"498750","unit":4.5},{"cat":"Miscellaneous Items","desc":"SPANDECK GUARDRAIL CONNECTOR","code":"498710","unit":1.0},{"cat":"Miscellaneous Items","desc":"SPANDECK GUARDRAIL POST","code":"498701","unit":2.0},{"cat":"Miscellaneous Items","desc":"SPANDECK SUPPORT ASSEMBLY","code":"498702","unit":5.0},{"cat":"Miscellaneous Items","desc":"STILLAGE - LARGE","code":"90201","unit":70.0},{"cat":"Miscellaneous Items","desc":"STILLAGE - SCREW JACK","code":"90210","unit":76.0},{"cat":"Miscellaneous Items","desc":"STILLAGE - STD","code":"90202","unit":40.0},{"cat":"Miscellaneous Items","desc":"TIMBER PALLETS","code":"99000","unit":20.0},{"cat":"Miscellaneous Items","desc":"UNIT BEAM 3.6 MTR","code":"453036","unit":58.0},{"cat":"Miscellaneous Items","desc":"WATER FILLED BARRIER","code":"943100","unit":33.7},{"cat":"Modular System","desc":"BRACE SCAFFOLD 2000 (WHITE)","code":"460720","unit":8.8},{"cat":"Modular System","desc":"BRACE SCAFFOLD 2700 (GREEN)","code":"460727","unit":10.5},{"cat":"Modular System","desc":"BRACE SCAFFOLD 3200 (BLACK)","code":"460732","unit":12.9},{"cat":"Modular System","desc":"BRACE SCAFFOLD 3500 (BLUE)","code":"460735","unit":15.75},{"cat":"Modular System","desc":"FILLER BOARD 0700 X 50 (infill)","code":"461507","unit":3.65},{"cat":"Modular System","desc":"FILLER BOARD 1200 X 50","code":"461512","unit":5.81},{"cat":"Modular System","desc":"FILLER BOARD 1800 X 50","code":"461518","unit":8.18},{"cat":"Modular System","desc":"FILLER BOARD 2400 X 50","code":"461524","unit":10.78},{"cat":"Modular System","desc":"HOP UP BRACKET 1 BOARD","code":"460910","unit":2.2},{"cat":"Modular System","desc":"HOP UP BRACKET 2 BOARD","code":"460920","unit":7.0},{"cat":"Modular System","desc":"HOP UP BRACKET 3 BOARD","code":"460930","unit":12.5},{"cat":"Modular System","desc":"L/A SWINGARM L/H (Y)","code":"461348","unit":2.3},{"cat":"Modular System","desc":"L/A SWINGARM R/H (R)","code":"461347","unit":2.3},{"cat":"Modular System","desc":"LADDER ACCESS BRACKET","code":"461346","unit":5.0},{"cat":"Modular System","desc":"LADDER ACCESS GATE 700mm","code":"461339","unit":7.5},{"cat":"Modular System","desc":"LADDER ACCESS GATE 900mm","code":"461340","unit":8.5},{"cat":"Modular System","desc":"LADDER ACCESS GATE INFILL","code":"461344","unit":6.5},{"cat":"Modular System","desc":"LADDER ACCESS STANDARD","code":"461345","unit":7.0},{"cat":"Modular System","desc":"LEDGER 0700","code":"460407","unit":3.4},{"cat":"Modular System","desc":"LEDGER 1200","code":"460412","unit":5.0},{"cat":"Modular System","desc":"LEDGER 1500","code":"460415","unit":5.9},{"cat":"Modular System","desc":"LEDGER 1800","code":"460418","unit":7.5},{"cat":"Modular System","desc":"LEDGER 2400","code":"460424","unit":9.7},{"cat":"Modular System","desc":"LEDGER 4800 BRIDGING","code":"460448","unit":20.0},{"cat":"Modular System","desc":"MESH GUARD 0700","code":"460807","unit":7.7},{"cat":"Modular System","desc":"MESH GUARD 1200","code":"460812","unit":15.0},{"cat":"Modular System","desc":"MESH GUARD 1800","code":"460818","unit":20.0},{"cat":"Modular System","desc":"MESH GUARD 2400","code":"460824","unit":25.5},{"cat":"Modular System","desc":"MODULAR (UNIVERSAL) ACCESS GATE","code":"461341","unit":7.5},{"cat":"Modular System","desc":"MODULAR HANDRAIL POST 1000 (V PRESSING)","code":"461210","unit":7.0},{"cat":"Modular System","desc":"MODULAR STAIRFLIGHT 2000 X 1200 (RED)","code":"461313","unit":50.0},{"cat":"Modular System","desc":"MODULAR TRANSOM STAIRFLIGHT 1200 GREEN","code":"460361","unit":9.5},{"cat":"Modular System","desc":"MODULAR TRANSOM TRUSS 2400","code":"460333","unit":60.0},{"cat":"Modular System","desc":"SCAFFGUARD 1200","code":"455503","unit":3.8},{"cat":"Modular System","desc":"SCAFFGUARD 1800","code":"455502","unit":5.5},{"cat":"Modular System","desc":"SCAFFGUARD 2400","code":"455501","unit":7.3},{"cat":"Modular System","desc":"STAIR STRINGER 1.6m (PAIR)","code":"461304","unit":39.0},{"cat":"Modular System","desc":"STAIR STRINGER 3.0m (PAIR)","code":"461300","unit":54.2},{"cat":"Modular System","desc":"STAIR STRINGER HOPDOWN","code":"461361","unit":8.0},{"cat":"Modular System","desc":"STAIRFLIGHT 1500 X 0600 MK3 (GREEN)","code":"461308","unit":28.0},{"cat":"Modular System","desc":"STAIRFLIGHT BOLT","code":"19005","unit":0.24},{"cat":"Modular System","desc":"STAIRFLIGHT HANDRAIL","code":"461311","unit":10.0},{"cat":"Modular System","desc":"STAIRFLIGHT TOP HANDRAIL","code":"461312","unit":17.5},{"cat":"Modular System","desc":"STAIRFLIGHT TRIMMER STANDARD","code":"461321","unit":9.0},{"cat":"Modular System","desc":"STANDARD - TOPPER","code":"460200","unit":1.7},{"cat":"Modular System","desc":"STANDARD INTERNAL SPIGOT 0500","code":"460005","unit":3.0},{"cat":"Modular System","desc":"STANDARD INTERNAL SPIGOT 1000","code":"460010","unit":6.6},{"cat":"Modular System","desc":"STANDARD INTERNAL SPIGOT 1500","code":"460015","unit":8.5},{"cat":"Modular System","desc":"STANDARD INTERNAL SPIGOT 2000","code":"460020","unit":11.6},{"cat":"Modular System","desc":"STANDARD INTERNAL SPIGOT 2500","code":"460025","unit":14.5},{"cat":"Modular System","desc":"STANDARD INTERNAL SPIGOT 3000","code":"460030","unit":17.0},{"cat":"Modular System","desc":"STEEL BOARD 0700","code":"460507","unit":5.2},{"cat":"Modular System","desc":"STEEL BOARD 1200","code":"460512","unit":8.5},{"cat":"Modular System","desc":"STEEL BOARD 1800","code":"460518","unit":12.25},{"cat":"Modular System","desc":"STEEL BOARD 2400","code":"460524","unit":16.33},{"cat":"Modular System","desc":"STEEL BOARD END TOE CLIP","code":"460552","unit":0.75},{"cat":"Modular System","desc":"STEEL BOARD TOE BRACKET","code":"460551","unit":0.75},{"cat":"Modular System","desc":"STEPDOWN BRACKET","code":"461360","unit":10.1},{"cat":"Modular System","desc":"TIE BAR 0700","code":"461007","unit":2.4},{"cat":"Modular System","desc":"TIE BAR 1200","code":"461012","unit":3.27},{"cat":"Modular System","desc":"TIE BAR 1800","code":"461018","unit":4.7},{"cat":"Modular System","desc":"TIE BAR 2400","code":"461024","unit":6.25},{"cat":"Modular System","desc":"TRANSOM 0700","code":"460307","unit":6.0},{"cat":"Modular System","desc":"TRANSOM 1200","code":"460312","unit":9.5},{"cat":"Modular System","desc":"TRANSOM 1800","code":"460318","unit":13.5},{"cat":"Modular System","desc":"TRANSOM 2400","code":"460324","unit":22.0},{"cat":"Modular System","desc":"TRANSOM LADDER ACCESS 1200","code":"460340","unit":9.2},{"cat":"Modular System","desc":"TRANSOM LADDER ACCESS 1800","code":"460341","unit":10.51}];
+const LAY = [{"cat":"BASE JACKS","ref":"4001060","desc":"Base Jack 60","pack":"","unit":3.6},{"cat":"BASE JACKS","ref":"4003000","desc":"Swivel Base Jack 60","pack":"","unit":5.5},{"cat":"STANDARDS","ref":"2602000","desc":"Base Collar","pack":"","unit":1.4},{"cat":"STANDARDS","ref":"2619050","desc":"Standard 0.5m LW Open Ended","pack":"","unit":2.5},{"cat":"STANDARDS","ref":"2619100","desc":"Standard 1.0m LW Open Ended","pack":"","unit":4.6},{"cat":"STANDARDS","ref":"2619150","desc":"Standard 1.5m LW Open Ended","pack":"","unit":6.6},{"cat":"STANDARDS","ref":"2619200","desc":"Standard 2.0m LW Open Ended","pack":"","unit":8.8},{"cat":"STANDARDS","ref":"2619250","desc":"Standard 2.5m LW Open Ended","pack":"","unit":11.7},{"cat":"STANDARDS","ref":"2619300","desc":"Standard 3.0m LW Open Ended","pack":"","unit":13.7},{"cat":"STANDARDS","ref":"2617050","desc":"Standard 0.5m LW (w Incorporated Spigot)","pack":"","unit":2.7},{"cat":"STANDARDS","ref":"2617100","desc":"Standard 1.0m LW (w Incorporated Spigot)","pack":"","unit":5.0},{"cat":"STANDARDS","ref":"2617150","desc":"Standard 1.5m LW (w Incorporated Spigot)","pack":"","unit":7.1},{"cat":"STANDARDS","ref":"2617200","desc":"Standard 2.0m LW (w Incorporated Spigot)","pack":"","unit":9.6},{"cat":"STANDARDS","ref":"2617250","desc":"Standard 2.5m LW (w Incorporated Spigot)","pack":"","unit":11.3},{"cat":"STANDARDS","ref":"2617300","desc":"Standard 3.0m LW (w Incorporated Spigot)","pack":"","unit":13.5},{"cat":"STANDARDS","ref":"2617400","desc":"Standard 4.0m LW (w Incorporated Spigot)","pack":"","unit":17.7},{"cat":"STANDARDS","ref":"2605000","desc":"Standard Spigot","pack":"","unit":1.6},{"cat":"O-LEDGERS","ref":"2601039","desc":"Ledger 0.39m LW","pack":"","unit":1.9},{"cat":"O-LEDGERS","ref":"2601045","desc":"Ledger 0.45m LW","pack":"","unit":2.1},{"cat":"O-LEDGERS","ref":"2601073","desc":"Ledger 0.73m LW","pack":"","unit":2.9},{"cat":"O-LEDGERS","ref":"2601109","desc":"Ledger 1.09m LW","pack":"","unit":4.0},{"cat":"O-LEDGERS","ref":"2601129","desc":"Ledger 1.29m LW","pack":"","unit":4.6},{"cat":"O-LEDGERS","ref":"2601140","desc":"Ledger 1.40m LW","pack":"","unit":5.0},{"cat":"O-LEDGERS","ref":"2601157","desc":"Ledger 1.57m LW","pack":"","unit":5.5},{"cat":"O-LEDGERS","ref":"2601207","desc":"Ledger 2.07m LW","pack":"","unit":7.0},{"cat":"O-LEDGERS","ref":"2601257","desc":"Ledger 2.57m LW","pack":"","unit":8.7},{"cat":"O-LEDGERS","ref":"2601307","desc":"Ledger 3.07m LW","pack":"","unit":10.1},{"cat":"O-LEDGERS","ref":"2601025","desc":"Ledger 0.25m Metric LW","pack":"","unit":1.4},{"cat":"O-LEDGERS","ref":"2601050","desc":"Ledger 0.50m Metric LW","pack":"","unit":2.2},{"cat":"O-LEDGERS","ref":"2601100","desc":"Ledger 1.00m Metric LW","pack":"","unit":3.7},{"cat":"U-TRANSOMS","ref":"2618045","desc":"U Transom 0.45m","pack":"","unit":2.1},{"cat":"U-TRANSOMS","ref":"2618073","desc":"U Transom 0.73m","pack":"","unit":3.1},{"cat":"U-TRANSOMS","ref":"2618109","desc":"U Transom 1.09m","pack":"","unit":4.4},{"cat":"U-TRANSOMS","ref":"2618139","desc":"U Transom 1.40m","pack":"","unit":5.4},{"cat":"U-TRANSOMS","ref":"2618157","desc":"U Transom 1.57m Reinforced","pack":"","unit":9.4},{"cat":"U-TRANSOMS","ref":"2618207","desc":"U Transom 2.07m Reinforced","pack":"","unit":12.7},{"cat":"U-TRANSOMS","ref":"2618257","desc":"U Transom 2.57m Reinforced","pack":"","unit":15.7},{"cat":"U-TRANSOMS","ref":"2618307","desc":"U Transom 3.07m Reinforced","pack":"","unit":18.0},{"cat":"LALO","ref":"2635039","desc":"Lock Against Lift-off 0.39m","pack":"","unit":0.6},{"cat":"LALO","ref":"2635045","desc":"Lock Against Lift-off 0.45m","pack":"","unit":0.7},{"cat":"LALO","ref":"2635073","desc":"Lock Against Lift-off 0.73m","pack":"","unit":1.3},{"cat":"LALO","ref":"2635109","desc":"Lock Against Lift-off 1.09m","pack":"","unit":1.8},{"cat":"LALO","ref":"2635140","desc":"Lock Against Lift-off 1.40m","pack":"","unit":2.5},{"cat":"LALO","ref":"2658157","desc":"Lock Against Lift-off 1.57m","pack":"","unit":5.9},{"cat":"LALO","ref":"2658207","desc":"Lock Against Lift-off 2.07m","pack":"","unit":7.9},{"cat":"LALO","ref":"2658257","desc":"Lock Against Lift-off 2.57m","pack":"","unit":9.9},{"cat":"LALO","ref":"2658307","desc":"Lock Against Lift-off 3.07m","pack":"","unit":11.9},{"cat":"LALO","ref":"2635000","desc":"Universal U-Lift-off preventer","pack":"","unit":1.0},{"cat":"2.0m HIGH BRACES","ref":"2683073","desc":"Diagonal Brace 0.73m x 2m","pack":"","unit":7.1},{"cat":"2.0m HIGH BRACES","ref":"2683109","desc":"Diagonal Brace 1.09m x 2m","pack":"","unit":7.4},{"cat":"2.0m HIGH BRACES","ref":"2683140","desc":"Diagonal Brace 1.40m x 2m","pack":"","unit":7.9},{"cat":"2.0m HIGH BRACES","ref":"2683157","desc":"Diagonal Brace 1.57m x 2m","pack":"","unit":8.2},{"cat":"2.0m HIGH BRACES","ref":"2683207","desc":"Diagonal Brace 2.07m x 2m","pack":"","unit":8.8},{"cat":"2.0m HIGH BRACES","ref":"2683257","desc":"Diagonal Brace 2.57m x 2m","pack":"","unit":10.0},{"cat":"2.0m HIGH BRACES","ref":"2683307","desc":"Diagonal Brace 3.07m x 2m","pack":"","unit":11.1},{"cat":"0.5m HIGH BRACES","ref":"2680109","desc":"Diagonal Brace 1.09m x 0.5m","pack":"","unit":4.4},{"cat":"0.5m HIGH BRACES","ref":"2680140","desc":"Diagonal Brace 1.40m x 0.5m","pack":"","unit":5.1},{"cat":"0.5m HIGH BRACES","ref":"2680157","desc":"Diagonal Brace 1.57m x 0.5m","pack":"","unit":5.6},{"cat":"0.5m HIGH BRACES","ref":"2680207","desc":"Diagonal Brace 2.07m x 0.5m","pack":"","unit":6.9},{"cat":"0.5m HIGH BRACES","ref":"2680257","desc":"Diagonal Brace 2.57m x 0.5m","pack":"","unit":8.2},{"cat":"0.5m HIGH BRACES","ref":"2680307","desc":"Diagonal Brace 3.07m x 0.5m","pack":"","unit":9.6},{"cat":"1.0m HIGH BRACES","ref":"2681073","desc":"Diagonal Brace 0.73m x 1m","pack":"","unit":4.5},{"cat":"1.0m HIGH BRACES","ref":"2681109","desc":"Diagonal Brace 1.09m x 1m","pack":"","unit":5.2},{"cat":"1.0m HIGH BRACES","ref":"2681140","desc":"Diagonal Brace 1.40m x 1m","pack":"","unit":5.8},{"cat":"1.0m HIGH BRACES","ref":"2681157","desc":"Diagonal Brace 1.57m x 1m","pack":"","unit":6.2},{"cat":"1.0m HIGH BRACES","ref":"2681207","desc":"Diagonal Brace 2.07m x 1m","pack":"","unit":7.4},{"cat":"1.0m HIGH BRACES","ref":"2681257","desc":"Diagonal Brace 2.57m x 1m","pack":"","unit":8.6},{"cat":"1.0m HIGH BRACES","ref":"2681307","desc":"Diagonal Brace 3.07m x 1m","pack":"","unit":9.9},{"cat":"1.5m HIGH BRACES","ref":"2682073","desc":"Diagonal Brace 0.73m x 1.5m","pack":"","unit":5.8},{"cat":"1.5m HIGH BRACES","ref":"2682109","desc":"Diagonal Brace 1.09m x 1.5m","pack":"","unit":6.3},{"cat":"1.5m HIGH BRACES","ref":"2682140","desc":"Diagonal Brace 1.40m x 1.5m","pack":"","unit":6.8},{"cat":"1.5m HIGH BRACES","ref":"2682157","desc":"Diagonal Brace 1.57m x 1.5m","pack":"","unit":7.3},{"cat":"1.5m HIGH BRACES","ref":"2682207","desc":"Diagonal Brace 2.07m x 1.5m","pack":"","unit":8.2},{"cat":"1.5m HIGH BRACES","ref":"2682257","desc":"Diagonal Brace 2.57m x 1.5m","pack":"","unit":9.5},{"cat":"1.5m HIGH BRACES","ref":"2682307","desc":"Diagonal Brace 3.07m x 1.5m","pack":"","unit":10.5},{"cat":"0.19m U-DECKS","ref":"3801073","desc":"U Steel Deck 0.73m x 0.19m","pack":"","unit":5.1},{"cat":"0.19m U-DECKS","ref":"3801109","desc":"U Steel Deck 1.09m x 0.19m","pack":"","unit":6.4},{"cat":"0.19m U-DECKS","ref":"3801140","desc":"U Steel Deck 1.40m x 0.19m","pack":"","unit":8.0},{"cat":"0.19m U-DECKS","ref":"3801157","desc":"U Steel Deck 1.57m x 0.19m","pack":"","unit":8.5},{"cat":"0.19m U-DECKS","ref":"3801207","desc":"U Steel Deck 2.07m x 0.19m","pack":"","unit":10.2},{"cat":"0.19m U-DECKS","ref":"3801257","desc":"U Steel Deck 2.57m x 0.19m","pack":"","unit":13.2},{"cat":"0.19m U-DECKS","ref":"3801307","desc":"U Steel Deck 3.07m x 0.19m","pack":"","unit":15.3},{"cat":"0.32m U-DECKS","ref":"3812073","desc":"U Steel Deck 0.73m x 0.32m","pack":"","unit":6.0},{"cat":"0.32m U-DECKS","ref":"3812109","desc":"U Steel Deck 1.09m x 0.32m","pack":"","unit":8.6},{"cat":"0.32m U-DECKS","ref":"3802129","desc":"U Steel Deck 1.29m x 0.32m","pack":"","unit":9.8},{"cat":"0.32m U-DECKS","ref":"3802140","desc":"U Steel Deck 1.40m x 0.32m","pack":"","unit":10.6},{"cat":"0.32m U-DECKS","ref":"3812157","desc":"U Steel Deck 1.57m x 0.32m","pack":"","unit":11.4},{"cat":"0.32m U-DECKS","ref":"3883207","desc":"U Steel Deck LW 2.07m x 0.32m","pack":"","unit":14.8},{"cat":"0.32m U-DECKS","ref":"3883257","desc":"U Steel Deck LW 2.57m x 0.32m","pack":"","unit":17.9},{"cat":"0.32m U-DECKS","ref":"3883307","desc":"U Steel Deck LW 3.07m x 0.32m","pack":"","unit":21.5},{"cat":"ACCESS DECKS","ref":"3851100","desc":"Aluminium Access Deck 1m","pack":"","unit":10.0},{"cat":"ACCESS DECKS","ref":"3851207","desc":"Aluminium Access Deck 2.07m","pack":"","unit":17.0},{"cat":"ACCESS DECKS","ref":"3852257","desc":"Aluminium Access Deck 2.57m with Ladder","pack":"","unit":24.0},{"cat":"ACCESS DECKS","ref":"3852307","desc":"Aluminium Access Deck 3.07m with Ladder","pack":"","unit":28.0},{"cat":"ACCESS DECKS","ref":"4005007","desc":"Access Ladder 7 Rungs (2.15m)","pack":"","unit":7.8},{"cat":"0.19m O=DECKS","ref":"3863073","desc":"O \u2013 Steel Deck T9 0.73m x 0.19m","pack":"","unit":5.0},{"cat":"0.19m O=DECKS","ref":"3863109","desc":"O \u2013 Steel Deck T9 1.09m x 0.19m","pack":"","unit":7.0},{"cat":"0.19m O=DECKS","ref":"3863140","desc":"O \u2013 Steel Deck T9 1.40m x 0.19m","pack":"","unit":9.0},{"cat":"0.19m O=DECKS","ref":"3863157","desc":"O \u2013 Steel Deck T9 1.57m x 0.19m","pack":"","unit":10.0},{"cat":"0.19m O=DECKS","ref":"3863207","desc":"O \u2013 Steel Deck T9 2.07m x 0.19m","pack":"","unit":10.7},{"cat":"0.19m O=DECKS","ref":"3863257","desc":"O \u2013 Steel Deck T9 2.57m x 0.19m","pack":"","unit":13.0},{"cat":"0.19m O=DECKS","ref":"3863307","desc":"O \u2013 Steel Deck T9 3.07m x 0.19m","pack":"","unit":18.2},{"cat":"0.32m O-DECKS","ref":"3862073","desc":"O - Steel Deck T9 0.73m x 0.32m","pack":"","unit":7.0},{"cat":"0.32m O-DECKS","ref":"3862109","desc":"O - Steel Deck T9 1.09m x 0.32m","pack":"","unit":9.4},{"cat":"0.32m O-DECKS","ref":"3862140","desc":"O - Steel Deck T9 1.40m x 0.32m","pack":"","unit":10.8},{"cat":"0.32m O-DECKS","ref":"3862157","desc":"O - Steel Deck T9 1.57m x 0.32m","pack":"","unit":12.5},{"cat":"0.32m O-DECKS","ref":"3862207","desc":"O - Steel Deck T9 2.07m x 0.32m","pack":"","unit":16.3},{"cat":"0.32m O-DECKS","ref":"3862257","desc":"O - Steel Deck T9 2.57m x 0.32m","pack":"","unit":18.6},{"cat":"0.32m O-DECKS","ref":"3862307","desc":"O - Steel Deck T9 3.07m x 0.32m","pack":"","unit":23.3},{"cat":"TOE BOARDS","ref":"727735","desc":"U-Steel Toe Board 0.39m","pack":"","unit":0.9},{"cat":"TOE BOARDS","ref":"727339","desc":"U-Steel Toe Board 0.45m","pack":"","unit":0.9},{"cat":"TOE BOARDS","ref":"2644073","desc":"U-Steel Toe Board 0.73m","pack":"","unit":1.8},{"cat":"TOE BOARDS","ref":"2644109","desc":"U-Steel Toe Board 1.09m","pack":"","unit":2.5},{"cat":"TOE BOARDS","ref":"2644140","desc":"U-Steel Toe Board 1.40m","pack":"","unit":3.1},{"cat":"TOE BOARDS","ref":"2644157","desc":"U-Steel Toe Board 1.57m","pack":"","unit":3.4},{"cat":"TOE BOARDS","ref":"2644207","desc":"U-Steel Toe Board 2.07m","pack":"","unit":4.4},{"cat":"TOE BOARDS","ref":"2644257","desc":"U-Steel Toe Board 2.57m","pack":"","unit":5.4},{"cat":"TOE BOARDS","ref":"2644307","desc":"U-Steel Toe Board 3.07m","pack":"","unit":6.3},{"cat":"GAP DECKS","ref":"2602073","desc":"Gap Deck 0.11m x 0.73m","pack":"","unit":4.5},{"cat":"GAP DECKS","ref":"2602109","desc":"Gap Deck 0.11m x 1.09m","pack":"","unit":5.9},{"cat":"GAP DECKS","ref":"2602140","desc":"Gap Deck 0.11m x 1.40m","pack":"","unit":6.9},{"cat":"GAP DECKS","ref":"2602157","desc":"Gap Deck 0.11m x 1.57m","pack":"","unit":7.8},{"cat":"GAP DECKS","ref":"2602207","desc":"Gap Deck 0.11m x 2.07m","pack":"","unit":8.5},{"cat":"GAP DECKS","ref":"2602257","desc":"Gap Deck 0.11m x 2.57m","pack":"","unit":10.1},{"cat":"GAP DECKS","ref":"2602307","desc":"Gap Deck 0.11m x 3.07m","pack":"","unit":13.5},{"cat":"U-CONSOLES (TRANSOMS)","ref":"2632019","desc":"Hop Up 0.19m","pack":"","unit":3.4},{"cat":"U-CONSOLES (TRANSOMS)","ref":"2632039","desc":"Hop Up 0.39m","pack":"","unit":3.9},{"cat":"U-CONSOLES (TRANSOMS)","ref":"2632073","desc":"Hop Up 0.73m","pack":"","unit":6.4},{"cat":"U-CONSOLES (TRANSOMS)","ref":"2632109","desc":"Hop Up 1.09m","pack":"","unit":12.0},{"cat":"U-CONSOLES (TRANSOMS)","ref":"2632045","desc":"Hop Up 0.45m Open Ended","pack":"","unit":3.1},{"cat":"U-CONSOLES (TRANSOMS)","ref":"2632074","desc":"Hop Up 0.73m Open Ended","pack":"","unit":5.0},{"cat":"U-CONSOLES (TRANSOMS)","ref":"4005036","desc":"Ledger Hop Up 0.36m","pack":"","unit":6.6},{"cat":"U-CONSOLES (TRANSOMS)","ref":"4005073","desc":"Ledger Hop Up 0.73m","pack":"","unit":8.5},{"cat":"U-CONSOLES (TRANSOMS)","ref":"2630037","desc":"U Corner Deck 0.36m","pack":"","unit":6.4},{"cat":"STAIRS","ref":"1752007","desc":"Internal Stair Guardrail T12","pack":"","unit":13.5},{"cat":"STAIRS","ref":"1752012","desc":"Internal Stair Guardrail Top","pack":"","unit":11.5},{"cat":"STAIRS","ref":"2638257","desc":"External Stair Guardrail 2.57m","pack":"","unit":18.1},{"cat":"STAIRS","ref":"1755257","desc":"Platform Stair 2.57x 2.0 x 0.64","pack":"","unit":27.0},{"cat":"STAIRS","ref":"2637000","desc":"Stair Guardrail Adaptor","pack":"","unit":0.7},{"cat":"STAIRS","ref":"2639004","desc":"Stairway Stringer 500 5 steps LW (1m rise)","pack":"","unit":18.0},{"cat":"STAIRS","ref":"2639008","desc":"Stairway Stringer 750 8 steps LW (1.5m rise)","pack":"","unit":36.4},{"cat":"STAIRS","ref":"2639009","desc":"Stairway Stringer 500 9 steps LW (2m rise)","pack":"","unit":34.0},{"cat":"STAIRS","ref":"2638400","desc":"Stair Guardrail Standard 1m","pack":"","unit":6.1},{"cat":"STAIRS","ref":"2638401","desc":"O Ledger with Wedge Head 1.9m","pack":"","unit":7.8},{"cat":"STAIRS","ref":"2634031","desc":"Stair Locking Clip (PACK OF 20)","pack":"","unit":1.0},{"cat":"BEAMS","ref":"4902200","desc":"Aluminium Lattice Beam 450 2m","pack":"","unit":8.5},{"cat":"BEAMS","ref":"4902400","desc":"Aluminium Lattice Beam 450 4m","pack":"","unit":17.1},{"cat":"BEAMS","ref":"4902600","desc":"Aluminium Lattice Beam 450 6m","pack":"","unit":23.6},{"cat":"BEAMS","ref":"4902800","desc":"Aluminium Lattice Beam 450 8m","pack":"","unit":32.7},{"cat":"BEAMS","ref":"4903225","desc":"Aluminium Lattice Beam 750 2.25m","pack":"","unit":14.0},{"cat":"BEAMS","ref":"4903325","desc":"Aluminium Lattice Beam 750 3.25m","pack":"","unit":19.5},{"cat":"BEAMS","ref":"4903425","desc":"Aluminium Lattice Beam 750 4.25m","pack":"","unit":26.0},{"cat":"BEAMS","ref":"4903525","desc":"Aluminium Lattice Beam 750 5.25m","pack":"","unit":32.1},{"cat":"BEAMS","ref":"4903625","desc":"Aluminium Lattice Beam 750 6.25m","pack":"","unit":38.1},{"cat":"BEAMS","ref":"4903725","desc":"Aluminium Lattice Beam 750 7.25m","pack":"","unit":44.2},{"cat":"BEAMS","ref":"2673207","desc":"U Lattice Beam 2.07m x 0.5m LW","pack":"","unit":21.4},{"cat":"BEAMS","ref":"2673257","desc":"U Lattice Beam 2.57m x 0.5m LW","pack":"","unit":24.9},{"cat":"BEAMS","ref":"2673307","desc":"U Lattice Beam 3.07m x 0.5m LW","pack":"","unit":31.9},{"cat":"BEAMS","ref":"2673414","desc":"U Lattice Beam 4.14m x 0.5m LW","pack":"","unit":40.0},{"cat":"BEAMS","ref":"2673514","desc":"U Lattice Beam 5.14m x 0.5m LW","pack":"","unit":51.2},{"cat":"BEAMS","ref":"2673614","desc":"U Lattice Beam 6.14m x 0.5m LW","pack":"","unit":60.5},{"cat":"BEAMS","ref":"4922000","desc":"Lattice Beam Spigot T4 38mm","pack":"","unit":1.9},{"cat":"MISC","ref":"2627011","desc":"Swing Gate 0.73m ADJUSTABLE","pack":"","unit":8.8},{"cat":"MISC","ref":"2627012","desc":"Swing Gate 1.0m ADJUSTABLE","pack":"","unit":10.5},{"cat":"MISC","ref":"2629000","desc":"Twin Wedge Coupler LW","pack":"","unit":1.2},{"cat":"MISC","ref":"2628001","desc":"Half Coupler with Joint","pack":"","unit":0.81},{"cat":"MISC","ref":"2628019","desc":"Rigid Wedge Coupler","pack":"","unit":1.1},{"cat":"MISC","ref":"2629019","desc":"Swivel Wedge Coupler","pack":"","unit":1.5},{"cat":"MISC","ref":"2602019","desc":"Adjustable Rosette","pack":"","unit":1.1},{"cat":"MISC","ref":"2602119","desc":"Adjustable Rosette with Thread","pack":"","unit":1.7},{"cat":"MISC","ref":"723819","desc":"Toe board Clip","pack":"","unit":0.7},{"cat":"MISC","ref":"4706019","desc":"O Spigot","pack":"","unit":1.81},{"cat":"MISC","ref":"2656001","desc":"U Spigot","pack":"","unit":2.1},{"cat":"MISC","ref":"2656002","desc":"U Spigot Adjustable Collar","pack":"","unit":2.1},{"cat":"MISC","ref":"2660000","desc":"Long Base Collar","pack":"","unit":2.2},{"cat":"MISC","ref":"1260201","desc":"Castor 1000","pack":"","unit":6.3},{"cat":"MISC","ref":"4905061","desc":"Special Bolt M12 x 60mm with Nut (Pack 50)","pack":"","unit":4.0},{"cat":"MISC","ref":"4905667","desc":"Hinge Pin D=12mm pan head (Pack 20)","pack":"","unit":2.0},{"cat":"MISC","ref":"4905000","desc":"Safety Clip 2.8mm","pack":"","unit":0.01},{"cat":"MISC","ref":"4905065","desc":"Safety Pin M12 x 65mm","pack":"","unit":0.07},{"cat":"MISC","ref":"726699","desc":"Spigot Crane Eyelet","pack":"","unit":4.25},{"cat":"MISC","ref":"4724022","desc":"Triple Coupler Crane Eyelet","pack":"","unit":3.3},{"cat":"MISC","ref":"2630000","desc":"AR Lifting Device","pack":"","unit":0.0},{"cat":"MISC","ref":"4700019","desc":"Double coupler 19mm","pack":"","unit":1.3},{"cat":"MISC","ref":"4702019","desc":"Swivel coupler 19mm","pack":"","unit":1.4},{"cat":"MISC","ref":"4421051","desc":"Hammer w reinfoced steel handle","pack":"","unit":0.8},{"cat":"MISC","ref":"4747000","desc":"Ratchet spanner 19mm/22mm WS","pack":"","unit":0.6},{"cat":"MISC","ref":"5105085","desc":"Tube pallet 0.85m (80 x 80)","pack":"","unit":30.8},{"cat":"MISC","ref":"5105125","desc":"Tube pallet 1.25m (120 x 80)","pack":"","unit":32.0},{"cat":"MISC","ref":"5113002","desc":"Euro mesh pallet with base","pack":"","unit":69.9},{"cat":"MISC","ref":"2602100","desc":"Spindle Attachment","pack":"","unit":2.0},{"cat":"ADJUSTABLE","ref":"2606001","desc":"Guardrail Adjustable 1.09m-1.57m","pack":"","unit":5.7},{"cat":"ADJUSTABLE","ref":"2606000","desc":"Guardrail Adjustable 1.57m-2.57m","pack":"","unit":8.5},{"cat":"ADJUSTABLE","ref":"3803000","desc":"Adjustable Deck 1.57m-2.57m x 0.32m","pack":"","unit":22.0},{"cat":"ADJUSTABLE","ref":"2606170","desc":"Guardrail 1.7m Standard Bent","pack":"","unit":8.5},{"cat":"ADJUSTABLE","ref":"2614001","desc":"U-Transom 0.32m Steel D - O","pack":"","unit":3.3},{"cat":"ADJUSTABLE","ref":"2614002","desc":"U-Transom 0.64m Steel D - O","pack":"","unit":4.4},{"cat":"ADJUSTABLE","ref":"2614004","desc":"U-Transom 0.96m Steel D - O","pack":"","unit":6.5},{"cat":"ADJUSTABLE","ref":"2614030","desc":"U-Transom 0.32m Steel D - D","pack":"","unit":3.1},{"cat":"ADJUSTABLE","ref":"2614073","desc":"U-Transom 0.64m Steel D - D","pack":"","unit":4.3},{"cat":"ADJUSTABLE","ref":"2614109","desc":"U-Transom 0.96m Steel D- D","pack":"","unit":6.9},{"cat":"GAP COVERS","ref":"3881000","desc":"Gap Cover 0.73 x 0.32m","pack":"","unit":2.6},{"cat":"GAP COVERS","ref":"3881001","desc":"Gap Cover 1.09 x 0.32m","pack":"","unit":3.8},{"cat":"GAP COVERS","ref":"3881002","desc":"Gap Cover 1.57 x 0.32m","pack":"","unit":4.2},{"cat":"GAP COVERS","ref":"3881003","desc":"Gap Cover 2.07 x 0.32m","pack":"","unit":6.3},{"cat":"GAP COVERS","ref":"3881004","desc":"Gap Cover 2.57 x 0.32m","pack":"","unit":8.5},{"cat":"GAP COVERS","ref":"3881005","desc":"Gap Cover 3.07 x 0.32m","pack":"","unit":12.0},{"cat":"GAP COVERS","ref":"3800011","desc":"Blue Screw SHORT (PACK 50)","pack":"","unit":2.3},{"cat":"GAP COVERS","ref":"3800009","desc":"Red Screw LONG (PACK 50)","pack":"","unit":4.0},{"cat":"GAP COVERS","ref":"3868109","desc":"U-Gap Cover with Claws 1.09m","pack":"","unit":5.0},{"cat":"GAP COVERS","ref":"3868140","desc":"U-Gap Cover with Claws 1.40m","pack":"","unit":6.5},{"cat":"GAP COVERS","ref":"3880100","desc":"Gap Cover with Pin 1.00m","pack":"","unit":6.5},{"cat":"GAP COVERS","ref":"3880150","desc":"Gap Cover with Pin 1.50m","pack":"","unit":10.3},{"cat":"GAP COVERS","ref":"3880200","desc":"Gap Cover with Pin 2.00m","pack":"","unit":12.8},{"cat":"GAP COVERS","ref":"3880250","desc":"Gap Cover with Pin 2.50m","pack":"","unit":15.3},{"cat":"GAP COVERS","ref":"712527","desc":"Corner Deck 1 0.8m","pack":"","unit":8.4},{"cat":"GAP COVERS","ref":"712528","desc":"Corner Deck 2 1.173m","pack":"","unit":6.7},{"cat":"GAP COVERS","ref":"712529","desc":"Corner Deck 3 1.557m","pack":"","unit":8.3}];
+
+// ── STATE ──────────────────────────────────────────
+const SKEY = 'ezscaf_v4';
+let S = { job:{num:'',date:'',op:''}, ezQ:{}, layQ:{}, stock:{} };
+// stock[key] = { qty, desc, unit, cat, src, totalIn, totalOut }
+// key = 'ez:CODE' or 'lay:REF'
+
+function load(){try{const s=localStorage.getItem(SKEY);if(s)S={...S,...JSON.parse(s)}}catch(e){}}
+function save(){try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}}
+function tod(){return new Date().toISOString().split('T')[0]}
+
+// ── NAV ────────────────────────────────────────────
+function nav(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tb').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  document.getElementById('tb-'+id).classList.add('on');
+  if(id==='sk') renderStock();
+}
+
+// ── JOB ────────────────────────────────────────────
+function openModal(id){
+  if(id==='jmod'){
+    document.getElementById('j-num').value=S.job.num||'';
+    document.getElementById('j-date').value=S.job.date||tod();
+    document.getElementById('j-op').value=S.job.op||'';
+  }
+  document.getElementById(id).classList.add('on');
+}
+function closeModal(id){document.getElementById(id).classList.remove('on')}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on')}));
+function saveJob(){
+  S.job={num:document.getElementById('j-num').value.trim(),date:document.getElementById('j-date').value,op:document.getElementById('j-op').value.trim()};
+  save(); updatePill(); closeModal('jmod'); toast('Job saved');
+}
+function updatePill(){
+  const p=document.getElementById('jobPill');
+  p.textContent=S.job.num?'📋 '+S.job.num:'+ SET JOB';
+}
+
+// ── HELPERS ────────────────────────────────────────
+function grp(arr,k){return arr.reduce((a,i)=>{const v=i[k]||'Other';(a[v]=a[v]||[]).push(i);return a},{})}
+function togCat(h){h.classList.toggle('shut');h.nextElementSibling.classList.toggle('shut')}
+
+// ── RENDER EZ ─────────────────────────────────────
+function renderEZ(){
+  const q=document.getElementById('ez-srch').value.toLowerCase();
+  const groups=grp(EZ,'cat'); let h='';
+  for(const[cat,items] of Object.entries(groups)){
+    const vis=items.filter(i=>!q||i.desc.toLowerCase().includes(q)||i.code.toLowerCase().includes(q)||cat.toLowerCase().includes(q));
+    if(!vis.length) continue;
+    h+=`<div><div class="cat-hdr" onclick="togCat(this)"><span>${cat}</span><span class="arr">▼</span></div><div class="cat-items">`;
+    vis.forEach(i=>{
+      const qty=S.ezQ[i.code]||0, tot=qty*i.unit;
+      h+=`<div class="ir${qty?' lit':''}">
+        <div class="ii"><div class="idesc">${i.desc}</div><div class="imeta"><span>${i.code}</span><span>${i.unit}kg ea</span></div></div>
+        <div class="qw">
+          <div class="qb" onclick="chQ('ez','${i.code}',${i.unit},-1)">−</div>
+          <input class="qi" type="number" min="0" value="${qty||''}" placeholder="0"
+            onchange="setQ('ez','${i.code}',${i.unit},this.value)" onfocus="this.select()">
+          <div class="qb" onclick="chQ('ez','${i.code}',${i.unit},1)">+</div>
+        </div>
+        <div class="qtot${qty?' v':''}">${qty?tot.toFixed(1)+'kg':''}</div>
+      </div>`;
+    });
+    h+=`</div></div>`;
+  }
+  document.getElementById('ez-body').innerHTML=h||'<div class="empty"><div class="ico">🔍</div><h3>No Results</h3></div>';
+}
+
+// ── RENDER LAYHER ──────────────────────────────────
+function renderLay(){
+  const q=document.getElementById('lay-srch').value.toLowerCase();
+  const groups=grp(LAY,'cat'); let h='';
+  for(const[cat,items] of Object.entries(groups)){
+    const vis=items.filter(i=>!q||i.desc.toLowerCase().includes(q)||i.ref.toLowerCase().includes(q)||cat.toLowerCase().includes(q));
+    if(!vis.length) continue;
+    h+=`<div><div class="cat-hdr" style="background:#252525" onclick="togCat(this)"><span>${cat}</span><span class="arr">▼</span></div><div class="cat-items">`;
+    vis.forEach(i=>{
+      const qty=S.layQ[i.ref]||0, tot=qty*i.unit;
+      h+=`<div class="ir${qty?' lit':''}">
+        <div class="ii"><div class="idesc">${i.desc}</div><div class="imeta"><span>${i.ref}</span><span>${i.unit}kg ea</span>${i.pack?`<span>Pk:${i.pack}</span>`:''}</div></div>
+        <div class="qw">
+          <div class="qb" onclick="chQ('lay','${i.ref}',${i.unit},-1)">−</div>
+          <input class="qi" type="number" min="0" value="${qty||''}" placeholder="0"
+            onchange="setQ('lay','${i.ref}',${i.unit},this.value)" onfocus="this.select()">
+          <div class="qb" onclick="chQ('lay','${i.ref}',${i.unit},1)">+</div>
+        </div>
+        <div class="qtot${qty?' v':''}">${qty?tot.toFixed(1)+'kg':''}</div>
+      </div>`;
+    });
+    h+=`</div></div>`;
+  }
+  document.getElementById('lay-body').innerHTML=h||'<div class="empty"><div class="ico">🔍</div><h3>No Results</h3></div>';
+}
+
+// ── QTY + LIVE STOCK UPDATE ────────────────────────
+function chQ(list,key,unit,d){
+  const st=list==='ez'?S.ezQ:S.layQ;
+  const prev=st[key]||0;
+  const next=Math.max(0,prev+d);
+  applyQtyChange(list,key,unit,prev,next);
+  if(!next) delete st[key]; else st[key]=next;
+  save();
+  list==='ez'?renderEZ():renderLay();
+}
+function setQ(list,key,unit,v){
+  const st=list==='ez'?S.ezQ:S.layQ;
+  const prev=st[key]||0;
+  const next=Math.max(0,parseInt(v)||0);
+  applyQtyChange(list,key,unit,prev,next);
+  if(!next) delete st[key]; else st[key]=next;
+  save();
+  list==='ez'?renderEZ():renderLay();
+}
+
+// Core stock logic: EZ goes OUT (deduct), Layher goes IN (add)
+function applyQtyChange(list,key,unit,prev,next){
+  const sk=(list==='ez'?'ez:':'lay:')+key;
+  // Find item details
+  const itemArr=list==='ez'?EZ:LAY;
+  const kf=list==='ez'?'code':'ref';
+  const item=itemArr.find(i=>i[kf]===key);
+  if(!item) return;
+
+  if(!S.stock[sk]){
+    S.stock[sk]={qty:0,desc:item.desc,unit:item.unit,cat:item.cat,src:list==='ez'?'EZ-SCAF':'LAYHER',totalIn:0,totalOut:0};
+  }
+  const diff=next-prev; // positive = more qty entered
+  if(list==='ez'){
+    // EZ items go OUT of stock when picked
+    S.stock[sk].qty -= diff;
+    if(diff>0) S.stock[sk].totalOut=(S.stock[sk].totalOut||0)+diff;
+    else S.stock[sk].totalOut=Math.max(0,(S.stock[sk].totalOut||0)+diff);
+  } else {
+    // Layher items come IN to stock when ordered
+    S.stock[sk].qty += diff;
+    if(diff>0) S.stock[sk].totalIn=(S.stock[sk].totalIn||0)+diff;
+    else S.stock[sk].totalIn=Math.max(0,(S.stock[sk].totalIn||0)+diff);
+  }
+}
+
+function clearQty(list){
+  if(!confirm('Clear all '+(list==='ez'?'EZ-SCAF':'Layher')+' quantities?\nThis will also undo the stock changes for this session.')) return;
+  const st=list==='ez'?S.ezQ:S.layQ;
+  // Reverse all current quantities from stock
+  Object.entries(st).forEach(([key,qty])=>{
+    const sk=(list==='ez'?'ez:':'lay:')+key;
+    const item=(list==='ez'?EZ:LAY).find(i=>(list==='ez'?i.code:i.ref)===key);
+    if(S.stock[sk]&&item) applyQtyChange(list,key,item.unit,qty,0);
+  });
+  if(list==='ez') S.ezQ={}; else S.layQ={};
+  save();
+  list==='ez'?renderEZ():renderLay();
+  toast('Cleared');
+}
+
+// ── STOCK PAGE ─────────────────────────────────────
+let curFilter='all';
+function skF(f,el){
+  curFilter=f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderStock();
+}
+
+function renderStock(){
+  const q=(document.getElementById('sk-srch')?.value||'').toLowerCase();
+  const all=Object.values(S.stock);
+
+  // Dashboard
+  const tracked=all.length;
+  const totalIn=all.reduce((s,e)=>s+(e.totalIn||0),0);
+  const totalOut=all.reduce((s,e)=>s+(e.totalOut||0),0);
+  document.getElementById('sk-dash').innerHTML=`
+    <div class="sk-card"><div class="sk-val">${tracked}</div><div class="sk-lbl">TRACKED</div></div>
+    <div class="sk-card"><div class="sk-val" style="color:var(--gr)">${totalIn}</div><div class="sk-lbl">TOTAL IN</div></div>
+    <div class="sk-card"><div class="sk-val" style="color:var(--re)">${totalOut}</div><div class="sk-lbl">TOTAL OUT</div></div>`;
+
+  let rows=all.filter(e=>{
+    if(q&&!e.desc.toLowerCase().includes(q)&&!(e.src+' '+e.cat).toLowerCase().includes(q)) return false;
+    if(curFilter==='ez') return e.src==='EZ-SCAF';
+    if(curFilter==='lay') return e.src==='LAYHER';
+    return true;
+  }).sort((a,b)=>a.src.localeCompare(b.src)||a.cat.localeCompare(b.cat)||a.desc.localeCompare(b.desc));
+
+  if(!rows.length){
+    document.getElementById('sk-body').innerHTML=`<div class="empty"><div class="ico">📦</div><h3>${tracked?'No matching items':'No Stock Data Yet'}</h3><p>${tracked?'Try a different filter':'Enter quantities on the EZ-SCAF or Layher tabs — stock updates automatically'}</p></div>`;
+    return;
+  }
+
+  let h='', prevSrc='';
+  rows.forEach(e=>{
+    if(e.src!==prevSrc){
+      h+=`<div style="background:var(--d4);color:#aaa;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:1px">${e.src}</div>`;
+      prevSrc=e.src;
+    }
+    const qcls=e.qty>0?'pos':e.qty===0?'zero':'neg';
+    const srcCls=e.src==='EZ-SCAF'?'s-ez':'s-lay';
+    h+=`<div class="sk-row">
+      <div class="sk-info">
+        <div class="sk-name">${e.desc} <span class="sk-src ${srcCls}">${e.src==='EZ-SCAF'?'EZ':'LAY'}</span></div>
+        <div class="sk-meta">${e.cat}</div>
+        <div class="sk-moves">
+          <span class="in-lbl">▲ IN: ${e.totalIn||0}</span>
+          <span class="out-lbl">▼ OUT: ${e.totalOut||0}</span>
+        </div>
+      </div>
+      <div class="sk-qty-box">
+        <div class="sk-num ${qcls}">${e.qty}</div>
+        <div style="font-size:10px;color:#aaa">${Math.max(0,e.qty*e.unit).toFixed(1)}kg</div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('sk-body').innerHTML=h;
+}
+
+// ── TOAST ──────────────────────────────────────────
+let _t;
+function toast(msg,ms=2000){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('on');
+  clearTimeout(_t); _t=setTimeout(()=>el.classList.remove('on'),ms);
+}
+
+// ── EMAIL SEND ─────────────────────────────────────
+let sendSrc = 'ez';
+
+function openSendModal(list) {
+  sendSrc = list;
+  const isEZ = list === 'ez';
+  const store = isEZ ? S.ezQ : S.layQ;
+  const items = isEZ ? EZ : LAY;
+  const kf = isEZ ? 'code' : 'ref';
+  const filled = items.filter(i => store[i[kf]]);
+
+  if (!filled.length) { toast('No quantities entered yet'); return; }
+
+  document.getElementById('s-title').textContent = isEZ ? 'Send EZ-SCAF Pick List' : 'Send Layher Order List';
+  document.getElementById('s-sub').textContent = `${filled.length} items with quantities`;
+  document.getElementById('s-send').className = 'btn bf ' + (isEZ ? 'bo' : 'bd');
+
+  // Restore saved email address
+  document.getElementById('s-email').value = S.savedEmail || '';
+
+  // Build preview text
+  const preview = buildEmailBody(list, filled, store, kf);
+  document.getElementById('s-preview').textContent = preview;
+
+  openModal('smod');
+}
+
+function buildEmailBody(list, filled, store, kf) {
+  const isEZ = list === 'ez';
+  const job = S.job.num || 'No job set';
+  const date = S.job.date || tod();
+  const op = S.job.op || '';
+  const header = isEZ ? 'EZ-SCAF PICK LIST' : 'LAYHER ORDER LIST';
+
+  let lines = [];
+  lines.push(header);
+  lines.push('='.repeat(40));
+  lines.push(`Job: ${job}`);
+  lines.push(`Date: ${date}`);
+  if (op) lines.push(`Operator: ${op}`);
+  lines.push('');
+
+  // Group by category
+  const bycat = {};
+  filled.forEach(i => {
+    const c = i.cat || 'Other';
+    if (!bycat[c]) bycat[c] = [];
+    bycat[c].push(i);
+  });
+
+  let totalKg = 0;
+  for (const [cat, items] of Object.entries(bycat)) {
+    lines.push(`--- ${cat} ---`);
+    items.forEach(i => {
+      const qty = store[i[kf]];
+      const kg = (qty * i.unit).toFixed(1);
+      totalKg += qty * i.unit;
+      const code = isEZ ? i.code : i.ref;
+      lines.push(`  ${i.desc.padEnd(32)} x${qty}  (${kg}kg)`);
+    });
+    lines.push('');
+  }
+
+  lines.push('='.repeat(40));
+  lines.push(`TOTAL WEIGHT: ${totalKg.toFixed(1)} kg`);
+  lines.push('');
+  lines.push('Sent from EZ-SCAF App');
+
+  return lines.join('\n');
+}
+
+function doSend() {
+  const email = document.getElementById('s-email').value.trim();
+  if (!email) { document.getElementById('s-email').focus(); toast('Enter an email address'); return; }
+
+  // Save email for next time
+  S.savedEmail = email;
+  save();
+
+  const isEZ = sendSrc === 'ez';
+  const store = isEZ ? S.ezQ : S.layQ;
+  const items = isEZ ? EZ : LAY;
+  const kf = isEZ ? 'code' : 'ref';
+  const filled = items.filter(i => store[i[kf]]);
+  const body = buildEmailBody(sendSrc, filled, store, kf);
+
+  const job = S.job.num || 'Pick List';
+  const subject = isEZ
+    ? `EZ-SCAF Pick List – ${job} – ${S.job.date || tod()}`
+    : `Layher Order List – ${job} – ${S.job.date || tod()}`;
+
+  const mailto = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
+  closeModal('smod');
+  toast('Opening email app…');
+}
+
+// ── INIT ───────────────────────────────────────────
+load(); updatePill();
+if(!S.job.date) S.job.date=tod();
+renderEZ(); renderLay();
+</script>
+</body>
+</html>
